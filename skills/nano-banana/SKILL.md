@@ -222,6 +222,11 @@ Save generated images to the location the user specifies. If no location is give
 use the current working directory. Use short, descriptive filenames (e.g., `hero.png`,
 `diagram-auth-flow.png`).
 
+**NEVER overwrite existing files.** Before writing, check if the target path exists.
+If it does, append a version suffix: `hero.jpg` → `hero-v2.jpg` → `hero-v3.jpg`, etc.
+Scan for existing versions to pick the next number. This applies to all generation and
+edit operations — every API call produces a new file.
+
 ## Error Handling
 
 | Error | Cause | Fix |
