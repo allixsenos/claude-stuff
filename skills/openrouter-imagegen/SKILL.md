@@ -51,12 +51,12 @@ print(f"\n{len(models)} image models available")
 PYEOF
 ```
 
-Run this at the start of any image generation session so you know what's available.
+Run this at the start of any image generation session, so you know what is available.
 
 ## Known Model Tiers
 
 These are the models typically available. The discovery command above is the
-source of truth — models come and go.
+source of truth. Models come and go.
 
 | Provider | Model ID | Strengths |
 |----------|----------|-----------|
@@ -212,7 +212,7 @@ if not images:
 
 ## Edit an Existing Image
 
-For models that accept image input (Google, OpenAI — check `input_modalities`):
+For models that accept image input (Google, OpenAI: check `input_modalities`):
 
 ```bash
 python3 -c "
@@ -271,10 +271,10 @@ for img_obj in msg.get('images', []):
 ```
 
 Replace:
-- `INPUT_IMAGE_PATH` — path to the image to edit
-- `EDIT_INSTRUCTION_HERE` — what to change
-- `MODEL_ID_HERE` — use a model with image in `input_modalities`
-- `RATIO_HERE`, `SIZE_HERE`, `OUTPUT_PATH_HERE` — same as generation
+- `INPUT_IMAGE_PATH`: path to the image to edit
+- `EDIT_INSTRUCTION_HERE`: what to change
+- `MODEL_ID_HERE`: use a model with image in `input_modalities`
+- `RATIO_HERE`, `SIZE_HERE`, `OUTPUT_PATH_HERE`: same as generation
 
 ## Generate Multiple Variations
 
@@ -326,7 +326,7 @@ All generated images and prompt files follow a strict naming scheme:
 **Prompts:** `prompt-descriptivename-v1-modelid.txt`
 
 Rules:
-- **Always start at v1.** Never create images without a version marker — iteration is expected.
+- **Always start at v1.** Never create an image without a version marker. You will iterate.
 - **Include a model identifier** so outputs from different models are distinguishable at a glance. Use a short canonical name or abbreviation:
   - `rf` or `riverflow` for Sourceful Riverflow
   - `nb` for Nano Banana (Gemini image models)
@@ -391,7 +391,7 @@ generations can be reproduced or iterated on later.
 1. **Start with "Generate an image:"** for text+image models
 2. **Be specific about composition**: left/right/center, foreground/background
 3. **Specify text explicitly**: wrap exact text in quotes within the prompt
-4. **Add "no text"** if you don't want text rendered in the image
+4. **Add "no text"** if you want no text in the image
 5. **Reference styles**: "editorial photography", "flat illustration", "3D render", "cinematic"
 6. **For text-heavy images**: Nano Banana Pro or GPT-5 Image handle text best
 

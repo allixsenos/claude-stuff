@@ -1,17 +1,17 @@
 # git-pr-whip
 
-Nudges Claude about PR hygiene at commit and push time, and blocks the one workflow where the nudge would arrive too late.
+Nudges Claude about PR hygiene at commit time and at push time. It also blocks the one workflow where the nudge would arrive too late.
 
 ## What it catches
 
-Three nudges and one block. Nudges are injected as `additionalContext` — Claude sees them, you don't.
+Three nudges and one block. Each nudge arrives as `additionalContext`, so Claude sees it and you do not.
 
-- **After `git commit`** — *"Before you push, run `gh pr view` and check that the PR is still open."* Catches the case where the PR was squash-merged while Claude was working and the branch is now stale.
-- **After `git push`** — *"Did these commits expand the PR's scope? Update the title and description with `gh pr edit`."* Catches *"while I'm here"* drift that leaves reviewers opening a PR titled *"fix null session"* and finding a logger refactor.
-- **After `git push`** — *"If you addressed review feedback, post a recap comment with what you accepted vs. dismissed."* Gives reviewers a record instead of forcing them to reconstruct it from the diff.
-- **Before `git commit && git push`** — denied. The commit-time reminder only lands *between* tool calls; if the push is chained behind the commit, the reminder arrives too late to change anything. Claude has to split the chain into two calls.
+- **After `git commit`.** *"Before you push, run `gh pr view` and check that the PR is still open."* This catches a PR that someone squash-merged while Claude worked, which leaves the branch stale.
+- **After `git push`.** *"Did these commits expand the PR's scope? Update the title and description with `gh pr edit`."* This catches *"while I'm here"* drift. A reviewer opens a PR titled *"fix null session"* and finds a logger refactor.
+- **After `git push`.** *"If you addressed review feedback, post a recap comment with what you accepted vs. dismissed."* This gives reviewers a record, so they do not have to rebuild it from the diff.
+- **Before `git commit && git push`.** Denied. The commit-time reminder lands only *between* tool calls. A push chained behind the commit gets the reminder too late. Claude must split the chain into two calls.
 
-Detection ignores `git commit` / `git push` inside quoted strings and heredoc bodies, and correctly leaves `git stash push` alone.
+Detection ignores `git commit` and `git push` inside a quoted string or a heredoc body, and it leaves `git stash push` alone.
 
 ## Install
 
@@ -25,11 +25,11 @@ No configuration.
 
 ## Why a hook and not CLAUDE.md
 
-Because Claude forgets. Memory and CLAUDE.md get compacted, glossed over, or outweighed by whatever is on-screen. A hook fires at the exact moment the reminder is actionable — right after the commit, right before the next push — which makes it much harder to skip past.
+Because Claude forgets. A compaction eats memory and CLAUDE.md, or whatever sits on screen outweighs them. A hook fires while the reminder can still change the outcome. That means right after the commit, and right before the next push. It is much harder to skip.
 
 ## It caught its own author five minutes in
 
-While I was writing this plugin's original README, the user squash-merged the plugin's own landing PR ([#19](https://github.com/allixsenos/claude-plugins/pull/19)). My next commit pushed to a branch that was now dead. The very reminder I had just written caught it — verbatim session:
+While I wrote the original README for this plugin, the user squash-merged its own landing PR ([#19](https://github.com/allixsenos/claude-plugins/pull/19)). My next commit pushed to a branch that was already dead. The reminder I wrote minutes earlier caught it. Here is the verbatim session:
 
 ```
 ❯ add a faux reproduction of the scenario that the plugin prevents to the plugin's README
@@ -70,8 +70,8 @@ better smoke test.
 ✻ Churned for 2m 18s
 ```
 
-Without the nudge, the orphaned commit would have silently stayed on the dead branch until someone noticed it wasn't on `master`. With it, recovery was three extra commands and zero lost work.
+Without the nudge, the orphaned commit would sit on the dead branch until someone noticed its absence from `master`. With the nudge, recovery cost three extra commands and no lost work.
 
 ## Pairs well with
 
-- **git-governor** — handles the dangerous stuff (amends on pushed commits, force pushes, commits to `main`). git-pr-whip handles the workflow-hygiene stuff governor doesn't block.
+- **git-governor** handles the dangerous operations. That means amends on pushed commits, force pushes, and commits to `main`. git-pr-whip handles the workflow hygiene that governor does not block.

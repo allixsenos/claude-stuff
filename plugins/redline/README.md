@@ -4,9 +4,9 @@ Configurable statusline for Claude Code with progress bars, git info, cost track
 
 ## Requirements
 
-`jq` — every component reads its data from the statusline JSON with it. Install
-it with `apt install jq`, `brew install jq`, or your platform equivalent. If it
-is missing the statusline says so instead of rendering blank.
+`jq`. Every component reads its data from the statusline JSON with it. Install
+it with `apt install jq`, `brew install jq`, or the equivalent on your platform.
+When `jq` is absent, the statusline says so instead of rendering blank.
 
 ## Install
 
@@ -17,13 +17,13 @@ is missing the statusline says so instead of rendering blank.
 /redline:setup
 ```
 
-The setup skill creates a version-resilient wrapper and configures your statusLine setting automatically.
+The setup skill writes a version-resilient wrapper, and sets your statusLine setting for you.
 
 ## Skills
 
-- `/redline:setup` — one-time setup after install
-- `/redline:configure` — interactively change the layout
-- `/redline:changelog` — show recent Claude Code release notes
+- `/redline:setup` runs the one-time setup after install
+- `/redline:configure` changes the layout interactively
+- `/redline:changelog` shows recent Claude Code release notes
 
 ## Features
 
@@ -32,9 +32,9 @@ The setup skill creates a version-resilient wrapper and configures your statusLi
 - Model name display
 - Progress bars for context window, 5h session limit, and 7d weekly limit
   - Color thresholds: green < 60%, yellow >= 60%, red >= 80%
-- Rate-limit bars include an in-bar `|` marker showing how far through the
-  window you are — usage fill past the marker = burning faster than real time
-- Short variants with dark grey brackets (e.g. `[5h 42%]`) flag burning pace
+- Rate-limit bars carry an in-bar `|` marker for your position in the window.
+  Fill past the marker means you burn faster than real time
+- Short variants with dark grey brackets (e.g. `[5h 42%]`) flag a burning pace
   with a bright red `↑` inside the brackets
 - Rate limit reset countdown (e.g. `4h`, `5d`) rounded up to the coarsest
   nonzero unit
@@ -79,19 +79,19 @@ Override config path with the `CLAUDE_STATUSLINE_CONFIG` env var.
 | `cwd` | Bold blue working directory |
 | `git` | Yellow branch name + red status flags |
 | `model` | Cyan model display name |
-| `ctx_bar` | Context window usage as `ctx NN% [bar]` 10-step progress bar. When `CLAUDE_CODE_AUTO_COMPACT_WINDOW` is set below the model's full window, cells past the cap render as `✘` so unreachable capacity is visible at a glance. |
+| `ctx_bar` | Context window usage as a `ctx NN% [bar]` 10-step progress bar. When `CLAUDE_CODE_AUTO_COMPACT_WINDOW` sits below the full window of the model, cells past the cap render as `✘`, which shows the unreachable capacity at a glance. |
 | `ctx_short` | Context window usage as colored text in brackets |
 | `5h_bar` | 5-hour rate limit: `5h NN% [bar\|with\|marker] countdown`. `\|` shows elapsed-time position |
 | `5h_short` | 5-hour rate limit as `[5h NN%]` with `↑` inside when burning hot + countdown |
 | `7d_bar` | 7-day rate limit: `7d NN% [bar\|with\|marker] countdown` |
 | `7d_short` | 7-day rate limit as `[7d NN%]` with `↑` inside when burning hot + countdown |
-| `fable_bar` | Fable weekly rate limit, as `fable NN% [bar\|with\|marker] countdown`. Off by default, and needs `asu` — see [Fable weekly limit](#fable-weekly-limit). |
+| `fable_bar` | Fable weekly rate limit, as `fable NN% [bar\|with\|marker] countdown`. Off by default, and needs `asu`. See [Fable weekly limit](#fable-weekly-limit). |
 | `fable_short` | Fable weekly rate limit as `[fable NN%]`, with the burn arrow inside and the countdown after |
 | `cost` | Session cost in yellow (e.g. `$0.42`) |
 | `lines` | Lines added (green) and removed (red) |
-| `update` | Shows bold yellow `↑ claude code A.B.C → X.Y.Z` when the latest on npm is newer than the version running this session. Reads the running version from the statusline's parent process (the Claude Code binary that launched this session — path format `.../versions/X.Y.Z/claude`), not from `claude --version` on PATH. Claude self-updates in the background, so PATH always points at the latest on disk; a long-running session stays on its launch version until you restart it, and this component flags that specifically. Silent when current or when the session binary isn't at a versioned path (e.g. custom installs). npm checked at most once every 4 hours (cached in `/tmp/redline-claude-version`). |
+| `update` | Shows bold yellow `↑ claude code A.B.C → X.Y.Z` when the latest on npm is newer than the version that runs this session. It reads the running version from the parent process of the statusline, which is the Claude Code binary that started this session, at the path `.../versions/X.Y.Z/claude`. It does not read `claude --version` on PATH. Claude self-updates in the background, so PATH always points at the latest copy on disk. A long-running session keeps its launch version until you restart it, and this component flags exactly that. It stays silent when the session is current, and when the session binary sits outside a versioned path, such as a custom install. It checks npm at most once every 4 hours, and caches the answer in `/tmp/redline-claude-version`. |
 
-Components can be placed on any line in any order. Omit a component to disable it entirely — no work is done for components not in the config.
+Put a component on any line, in any order. Omit a component to turn it off completely. The script does no work for a component that is absent from the config.
 
 ### Fable weekly limit
 

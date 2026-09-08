@@ -10,9 +10,9 @@ description: |
 ## Steps
 
 1. Detect the running session's Claude Code version, NOT the version on PATH.
-   `claude --version` is unreliable here because Claude Code self-updates in the
-   background — PATH almost always points at the latest release on disk, even
-   when this session is still running an older binary. The whole point of this
+   `claude --version` is unreliable here, because Claude Code self-updates in the
+   background. PATH almost always points at the latest release on disk, even
+   when this session still runs an older binary. The whole point of this
    command is "what release notes apply to me right now," so we have to read
    the version from the actual session process.
 
@@ -37,7 +37,7 @@ description: |
 
    If the walk returns nothing (e.g. custom install not at a versioned path),
    fall back to `claude --version` and note in the output that this is the
-   PATH version, not necessarily what this session is running.
+   PATH version, which is not always the version this session runs.
 
 2. Get the latest published version: `npm view @anthropic-ai/claude-code version`
 
@@ -48,8 +48,8 @@ description: |
 
 4. If the session version is behind the latest, highlight that **restarting
    the session** will pick up the newer binary (Claude Code self-updates on
-   disk in the background, so you usually don't need to run `npm update` —
-   just exit and relaunch). Only suggest `npm update -g @anthropic-ai/claude-code`
+   disk in the background, so you rarely need to run `npm update`. Just exit
+   and relaunch). Only suggest `npm update -g @anthropic-ai/claude-code`
    if the on-disk version is also behind, which the user can check with
    `claude --version`.
 
@@ -58,6 +58,7 @@ description: |
    gh release view <tag> --repo anthropics/claude-code
    ```
 
-   Present the output in a clean, readable format — version as a header, body as-is.
+   Present the output in a clean, readable format. Put the version in a header, and keep the body as it is.
 
-6. If the session is already on the latest version, say so and show notes for the most recent 2-3 releases anyway.
+6. If the session already runs the latest version, say so. Show notes for the
+   most recent 2-3 releases anyway.
