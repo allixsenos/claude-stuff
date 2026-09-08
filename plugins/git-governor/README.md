@@ -1,6 +1,6 @@
 # git-governor
 
-A Claude Code plugin that enforces git governance via PreToolUse hooks. Install once, never worry about Claude nuking your git history again.
+A Claude Code plugin that enforces git governance through PreToolUse hooks. Install it once, and stop worrying that Claude will destroy your git history.
 
 ## Rules
 
@@ -19,7 +19,7 @@ A Claude Code plugin that enforces git governance via PreToolUse hooks. Install 
 
 Protected branches default to `main` and `master`.
 
-The `require-git-repo` rule blocks file edits to paths that aren't inside a git repository. A project can opt out by including a phrase like "will not use git" in its `CLAUDE.md`.
+The `require-git-repo` rule blocks file edits to any path outside a git repository. A project opts out with a phrase such as "will not use git" in its `CLAUDE.md`.
 
 ## Install
 
@@ -67,11 +67,11 @@ Every rule supports three modes:
 
 | Mode | Effect |
 |------|--------|
-| `"deny"` | Hard block — tool call is prevented |
-| `"ask"` | Prompt the user for confirmation before proceeding |
-| `"allow"` | Disabled — no check performed |
+| `"deny"` | Hard block. The tool call does not run |
+| `"ask"` | Prompt the user to confirm first |
+| `"allow"` | Off. No check runs |
 
-Use `"deny"` for operations that should never happen (force push, reset --hard). Use `"ask"` for operations where you want a human checkpoint (committing on protected, discarding changes). Invalid values are treated as errors and blocked.
+Use `"deny"` for an operation that must never happen, such as a force push or `reset --hard`. Use `"ask"` for an operation that needs a human checkpoint, such as a commit on a protected branch, or a change you discard. The hook treats an invalid value as an error, and blocks the call.
 
 ### Config precedence
 
@@ -81,7 +81,7 @@ Use `"deny"` for operations that should never happen (force push, reset --hard).
 | Global | `~/.claude/git-governor.json` | Middle |
 | Defaults | Built into the hook | Lowest |
 
-For rules, each rule is resolved independently: project > global > default. For `protected-branches`, the first config that defines the key wins entirely (no merging).
+The hook resolves each rule on its own: project, then global, then default. For `protected-branches`, the first config that sets the key wins outright. Nothing merges.
 
 ## License
 

@@ -3,7 +3,7 @@ name: linkedin-data-portability
 description: |
   Fetch LinkedIn member data (connections, profile, posts, messages, jobs, etc.) via the
   Member Data Portability API (DMA). Use when the user wants to export, explore, or analyze
-  their LinkedIn data — connections, profile, inbox, job applications, endorsements, etc.
+  their LinkedIn data: connections, profile, inbox, job applications, endorsements, etc.
   Requires EEA/Swiss LinkedIn account. Triggers on: "pull my LinkedIn connections",
   "export LinkedIn data", "get my LinkedIn profile", "download LinkedIn messages".
 ---
@@ -17,9 +17,9 @@ EU Digital Markets Act API that lets LinkedIn members export their own data via 
 ## Setup (one-time)
 
 1. Go to https://developer.linkedin.com/ and create a developer application
-2. **Use the default company page:** [Member Data Portability (Member) Default Company](https://www.linkedin.com/company/member-data-portability-member-default-company) — do NOT create a new company page
+2. **Use the default company page:** [Member Data Portability (Member) Default Company](https://www.linkedin.com/company/member-data-portability-member-default-company). Do NOT create a new company page
 3. In the Products tab, click **Request access** for **Member Data Portability API (Member)**
-4. Accept Terms and Conditions — access is granted immediately
+4. Accept Terms and Conditions. Access starts immediately
 
 ### Generate access token
 
@@ -27,7 +27,7 @@ EU Digital Markets Act API that lets LinkedIn members export their own data via 
 2. Click **Create token**
 3. Select the app provisioned with Member Data Portability API (Member)
 4. Select scope: `r_dma_portability_self_serve`
-5. Click **Request access token** — login and consent when redirected
+5. Click **Request access token**. Log in and consent when the page redirects you
 6. Copy the access token
 
 ## Member Snapshot API
@@ -90,7 +90,7 @@ curl -s 'https://api.linkedin.com/rest/memberSnapshotData?q=criteria&domain=CONN
 
 ### Pagination
 
-Response may be paginated. Follow `paging.links` with `rel: "next"` until you get a 404 or error "No data found for this memberId". The `total` field may be inaccurate — always paginate until exhaustion.
+Response may be paginated. Follow `paging.links` with `rel: "next"` until you get a 404 or error "No data found for this memberId". The `total` field can be inaccurate, so always paginate to the end.
 
 ### Key domains for common tasks
 
@@ -159,6 +159,6 @@ Body: {}
 
 1. Generate access token (see Setup above)
 2. Fetch first page: `GET ...?q=criteria&domain=CONNECTIONS&start=0&count=10`
-3. Extract `elements[0].snapshotData` array — each entry is one connection
+3. Extract the `elements[0].snapshotData` array. Each entry is one connection
 4. Follow `paging.links[rel=next]` until exhausted
 5. Flatten all `snapshotData` arrays into a single CSV

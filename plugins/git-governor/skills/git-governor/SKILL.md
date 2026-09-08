@@ -58,13 +58,13 @@ For protected branches: the first config that defines `protected-branches` wins 
 
 | Mode | Effect |
 |------|--------|
-| `deny` | Hard block — tool call prevented |
+| `deny` | Hard block. The tool call does not run |
 | `ask` | Prompt user for confirmation |
-| `allow` | Disabled — no check |
+| `allow` | Off. No check runs |
 
 ## Instructions
 
-ARGUMENTS: provided after the skill name, e.g. `/git-governor set no-amend ask`
+ARGUMENTS: given after the skill name, e.g. `/git-governor set no-amend ask`
 
 ### Default command (no arguments, or `status`)
 
@@ -107,9 +107,9 @@ Add --global to target ~/.claude/git-governor.json instead of the project config
 3. Determine target file:
    - Without `--global`: `<CWD>/.claude/git-governor.json`
    - With `--global`: `~/.claude/git-governor.json`
-4. Read the target file. If it doesn't exist, start with `{}`.
+4. Read the target file. If it does not exist, start with `{}`.
 5. Set `.rules.<rule>` to the mode value (as a string).
-6. Ensure the `.rules` object exists in the JSON.
+6. Make sure the `.rules` object exists in the JSON.
 7. Create the parent directory if needed (`mkdir -p` via Bash).
 8. Write the complete JSON back with 2-space indentation.
 9. Confirm: `Set <rule> = "<mode>" in <scope> config.`
@@ -117,7 +117,7 @@ Add --global to target ~/.claude/git-governor.json instead of the project config
 ### Command: `protect <pattern>`
 
 1. Determine target file (project or global based on `--global`).
-2. Read the target file. If it doesn't exist, start with `{}`.
+2. Read the target file. If it does not exist, start with `{}`.
 3. Read the current `protected-branches` array. If absent, start with `[]`.
 4. If the pattern is already in the array, inform the user and stop.
 5. Append the pattern to the array.
@@ -127,7 +127,7 @@ Add --global to target ~/.claude/git-governor.json instead of the project config
 ### Command: `unprotect <pattern>`
 
 1. Determine target file (project or global based on `--global`).
-2. Read the target file. If it doesn't exist, inform the user there's nothing to change.
+2. Read the target file. If it does not exist, tell the user there is nothing to change.
 3. Read the current `protected-branches` array. If absent, inform the user.
 4. If the pattern is not in the array, inform the user and stop.
 5. Remove the pattern from the array.
@@ -138,7 +138,7 @@ Add --global to target ~/.claude/git-governor.json instead of the project config
 ### Command: `reset`
 
 1. Determine target file (project or global based on `--global`).
-2. If the file doesn't exist, inform the user there's nothing to reset.
+2. If the file does not exist, tell the user there is nothing to reset.
 3. Delete the file using Bash `rm`.
 4. Confirm: `Deleted <scope> config. Defaults will be used.`
 

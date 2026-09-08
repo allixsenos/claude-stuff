@@ -41,7 +41,7 @@ All domains are **case-sensitive**. Use exactly as listed when querying the Memb
 | `LEARNING_ROLEPLAY_INBOX` | Insights from interactive learning scenarios |
 | `MARKETPLACE_ENGAGEMENTS` | Event name, date/time, status, external URL |
 | `MARKETPLACE_OPPORTUNITIES` | Services looking for on Services Marketplace |
-| `MARKETPLACE_PROVIDERS` | Services provided on Services Marketplace |
+| `MARKETPLACE_PROVIDERS` | Services you offer on Services Marketplace |
 | `MEMBER_FOLLOWING` | People followed on LinkedIn |
 | `MEMBER_SHARE_INFO` | Shared/re-shared posts: date, URL, comments, visibility |
 | `ORGANIZATIONS` | Organizations on profile |

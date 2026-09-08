@@ -22,7 +22,8 @@ Read `~/.claude/statusline-config.json` if it exists. If not, note the defaults:
 
 ## Step 2: Show the dashboard
 
-Present the current layout with a monochrome ASCII preview of what each line looks like, and list available components with descriptions. Use this exact format:
+Present the current layout with a monochrome ASCII preview of each line. Then
+list the available components with their descriptions. Use this exact format:
 
 ```
 Current layout:
@@ -64,16 +65,17 @@ Meters (bar = visual bar, short = compact text):
   fable_bar    Fable weekly limit bar        fable 11% [|.........] 7d
   fable_short  Fable weekly limit text       [fable 11%] 7d
 
-`fable_bar` and `fable_short` are off by default and stay silent unless the
-user adds them. Fable has a weekly quota of its own, and the statusline JSON
-does not carry it, so these two read it from `asu` in the background. Before
-you offer them, make sure `asu` runs: `asu claude --json`. If it does not,
-either install it (`npm install -g @allixsenos/asu`) or set `asu_cmd` to
+`fable_bar` and `fable_short` are off by default, and they stay silent unless
+the user adds them. Fable has a weekly quota of its own, and the statusline
+JSON does not carry it, so these two read it from `asu` in the background.
+
+Before you offer them, make sure `asu` runs: `asu claude --json`. If it does
+not, install it (`npm install -g @allixsenos/asu`), or set `asu_cmd` to
 `npx --yes @allixsenos/asu`. The components print nothing when `asu` is
 absent, so a missing install looks the same as an empty statusline.
 
-Rate-limit bars include a `|` marker at the elapsed-time position — fill past
-the marker means usage is pulling ahead of the clock. Short variants get a
+Rate-limit bars carry a `|` marker at the elapsed-time position. Fill past
+the marker means usage runs ahead of the clock. Short variants get a
 bright red `↑` inside the brackets when burning hot (usage > elapsed + burn_threshold).
 
 Stats:
@@ -88,8 +90,8 @@ Updates:
 ```
 
 Note: countdowns show the coarsest nonzero unit, rounded up (e.g. 4h30m → 5h,
-3d15h → 4d). They always appear by default; set `show_reset_at` to a threshold
-(0-100) to hide them at low usage.
+3d15h → 4d). They always appear by default. Set `show_reset_at` to a threshold
+from 0 to 100 to hide them at low usage.
 
 ## Step 3: Ask what to change
 

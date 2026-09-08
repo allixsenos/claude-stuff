@@ -2,11 +2,11 @@
 
 Keeps Claude oriented in time during long sessions.
 
-Claude has no internal clock. In conversations that span hours, it loses track of time completely -- guessing 3 AM when it's actually noon, or not knowing what day it is after a context compaction.
+Claude has no internal clock. In conversations that span hours, it loses track of time completely. It guesses 3 AM when the real time is noon, or it does not know the day after a context compaction.
 
 ![The problem](the-problem.jpg)
 
-Clockwork fixes this by injecting the current day, date, and time into the conversation context. It fires on every message you send, but only injects the time if 10+ minutes have passed since the last injection -- so it stays out of the way during rapid back-and-forth.
+Clockwork injects the current day, date, and time into the conversation context. The hook fires on every message you send. It injects the time only after 10 minutes pass since the last injection, so it stays out of the way during a rapid back and forth.
 
 ## Install
 
@@ -16,19 +16,19 @@ Clockwork fixes this by injecting the current day, date, and time into the conve
 /reload-plugins
 ```
 
-That's it. No configuration needed.
+That is all. It needs no configuration.
 
 ## How it works
 
-A `UserPromptSubmit` hook runs a shell script that:
-1. Checks a timestamp file (`/tmp/claude-clockwork.stamp`)
-2. If 10+ minutes have elapsed, injects `Current time: Tuesday, 2026-04-14 11:40 CEST` into the context
-3. If less than 10 minutes, does nothing
+A `UserPromptSubmit` hook runs a shell script:
+1. The script reads a timestamp file (`/tmp/claude-clockwork.stamp`).
+2. After 10 minutes or more, it injects `Current time: Tuesday, 2026-04-14 11:40 CEST` into the context.
+3. Under 10 minutes, it does nothing.
 
-The injection appears as context to Claude, not as a visible message to you.
+Claude sees the injection as context. You never see it as a message.
 
 ![It works](it-works.png)
 
 ## Why 10 minutes?
 
-Short enough that Claude stays oriented across topic changes and context compactions. Long enough that it doesn't waste tokens on every single message.
+Short enough that Claude stays oriented across topic changes and context compactions. Long enough that it does not waste tokens on every single message.

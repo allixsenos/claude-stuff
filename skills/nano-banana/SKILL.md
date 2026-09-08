@@ -15,7 +15,7 @@ allowed-tools:
   - Read
 ---
 
-# Nano Banana — Direct Gemini API Image Generation
+# Nano Banana: Direct Gemini API Image Generation
 
 Generate and edit images by calling the Gemini API directly via curl.
 
@@ -114,11 +114,11 @@ for part in data.get('candidates', [{}])[0].get('content', {}).get('parts', []):
 ```
 
 Replace:
-- `${MODEL}` — model ID from table above
-- `PROMPT_HERE` — the image prompt
-- `RATIO_HERE` — aspect ratio
-- `SIZE_HERE` — image size
-- `OUTPUT_PATH_HERE` — full output file path
+- `${MODEL}`: model ID from table above
+- `PROMPT_HERE`: the image prompt
+- `RATIO_HERE`: aspect ratio
+- `SIZE_HERE`: image size
+- `OUTPUT_PATH_HERE`: full output file path
 
 ## Edit an Existing Image
 
@@ -180,10 +180,10 @@ for part in data.get('candidates', [{}])[0].get('content', {}).get('parts', []):
 ```
 
 Replace:
-- `INPUT_IMAGE_PATH` — path to the image to edit
-- `EDIT_INSTRUCTION_HERE` — what to change (e.g., "remove the background", "make it more blue")
-- `MODEL_HERE` — model ID (Pro recommended for edits)
-- `RATIO_HERE`, `SIZE_HERE`, `OUTPUT_PATH_HERE` — same as generation
+- `INPUT_IMAGE_PATH`: path to the image to edit
+- `EDIT_INSTRUCTION_HERE`: what to change (e.g., "remove the background", "make it more blue")
+- `MODEL_HERE`: model ID (Pro recommended for edits)
+- `RATIO_HERE`, `SIZE_HERE`, `OUTPUT_PATH_HERE`: same as generation
 
 ## Generate Multiple Variations
 
@@ -241,7 +241,7 @@ All generated images and prompt files follow a strict naming scheme:
 **Prompts:** `prompt-descriptivename-v1-modelid.txt`
 
 Rules:
-- **Always start at v1.** Never create images without a version marker — iteration is expected.
+- **Always start at v1.** Never create an image without a version marker. You will iterate.
 - **Include a model identifier** so outputs from different models are distinguishable at a glance. Use a short canonical name or abbreviation:
   - `nb` for Nano Banana Pro (`gemini-3-pro-image-preview`)
   - `nb-flash` for Nano Banana Flash (`gemini-2.5-flash-image`)
@@ -301,6 +301,6 @@ generations can be reproduced or iterated on later.
 1. **Start with "Generate an image:"** to make intent clear to the model
 2. **Be specific about composition**: left/right/center, foreground/background
 3. **Specify text explicitly**: wrap exact text in quotes within the prompt
-4. **Add "no text"** if you don't want text rendered in the image
+4. **Add "no text"** if you want no text in the image
 5. **Reference styles**: "editorial photography", "flat illustration", "3D render", "watercolor", "cinematic"
 6. **For text-heavy images**: Nano Banana Pro handles text rendering better than Flash

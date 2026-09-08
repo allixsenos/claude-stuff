@@ -1,6 +1,6 @@
 # linkedin-data-portability
 
-Export LinkedIn member data (connections, profile, posts, messages, job applications, and 50+ other data domains) via the EU DMA Data Portability API.
+Export LinkedIn member data through the EU DMA Data Portability API. It covers connections, profile, posts, messages, job applications, and more than 50 other data domains.
 
 ## Install
 
