@@ -311,6 +311,88 @@ component_7d_short() {
     "$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')"
 }
 
+# Helper: Fable's weekly rate limit, which the statusline JSON does not carry.
+# Claude Code parses a per-model bucket internally (rate_limits.model_scoped,
+# labelled e.g. "Fable") but only forwards five_hour, seven_day and spend_limit
+# to the statusline hook, so the number has to come from somewhere else. `asu`
+# reads it from the same subscription API. Opt-in: nothing here runs unless
+# fable_bar or fable_short is in the config.
+#
+# Echoes "<percent> <resets_at_epoch>", or nothing when unavailable.
+asu_fable_window() {
+  local cache="/tmp/redline-asu-$(id -u).json"
+  local ttl asu_cmd now cached_at=0
+  ttl=$(echo "$config" | jq -r '.fable_ttl // 300')
+  asu_cmd=$(echo "$config" | jq -r '.asu_cmd // "asu"')
+
+  now=$(date +%s)
+  if [ -f "$cache" ]; then
+    cached_at=$(stat -c %Y "$cache" 2>/dev/null || stat -f %m "$cache" 2>/dev/null || echo 0)
+  fi
+
+  # Refresh out of band. asu costs ~0.7s (node startup plus a network call when
+  # its own 5-minute cache is cold) and the statusline re-renders constantly, so
+  # a blocking refresh would stall the prompt.
+  #
+  # Two guards, because they stop different things. The touch bounds retries: a
+  # refresh that fails leaves the cache untouched, so without it every later
+  # render would try again. The lock bounds concurrency: every session on this
+  # machine shares one cache file, so N sessions rendering at the same moment
+  # all read the same stale mtime and would all fork a refresher. mkdir is
+  # atomic, so exactly one of them wins.
+  if [ $((now - cached_at)) -ge "$ttl" ]; then
+    local lock="$cache.lock"
+    # A refresher killed mid-flight leaks its lock and would freeze the
+    # component for good, so treat a lock older than the TTL as abandoned.
+    if [ -d "$lock" ]; then
+      local lock_at
+      lock_at=$(stat -c %Y "$lock" 2>/dev/null || stat -f %m "$lock" 2>/dev/null || echo 0)
+      [ $((now - lock_at)) -ge "$ttl" ] && rmdir "$lock" 2>/dev/null
+    fi
+    if mkdir "$lock" 2>/dev/null; then
+      touch "$cache" 2>/dev/null
+      # Detach all three descriptors — a child holding the statusline's stdout
+      # open would block Claude Code waiting for EOF.
+      # shellcheck disable=SC2086 -- asu_cmd is split on purpose, so "npx --yes @allixsenos/asu" works
+      ( $asu_cmd claude --json > "$cache.tmp" 2>/dev/null \
+          && mv -f "$cache.tmp" "$cache" \
+          || rm -f "$cache.tmp"
+        rmdir "$lock" 2>/dev/null ) > /dev/null 2>&1 < /dev/null &
+    fi
+  fi
+
+  [ -s "$cache" ] || return
+
+  local pct resets
+  read -r pct resets <<< "$(jq -r '
+    .providers[]? | select(.providerId == "claude") | .windows[]?
+    | select(.id == "weekly-model-fable" and .percentUsed != null and .resetsAt != null)
+    | "\(.percentUsed) \((.resetsAt | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601))"
+  ' "$cache" 2>/dev/null | head -1)"
+  [ -z "$pct" ] && return
+
+  # A window whose reset has already passed is stale by definition — the usage
+  # rolled over and the cached percentage describes the previous week. Render
+  # nothing and let the refresh already in flight replace it.
+  [ "$resets" -le "$now" ] 2>/dev/null && return
+
+  echo "$pct $resets"
+}
+
+component_fable_bar() {
+  local pct resets
+  read -r pct resets <<< "$(asu_fable_window)"
+  [ -z "$pct" ] && return
+  make_meter_bar "fable" "$pct" "$WINDOW_7D_SECS" "$resets"
+}
+
+component_fable_short() {
+  local pct resets
+  read -r pct resets <<< "$(asu_fable_window)"
+  [ -z "$pct" ] && return
+  make_meter_short "fable" "$pct" "$WINDOW_7D_SECS" "$resets"
+}
+
 component_cost() {
   local cost
   cost=$(echo "$input" | jq -r '.cost.total_cost_usd // empty')
