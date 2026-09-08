@@ -16,6 +16,8 @@ Interactive configuration for the redline statusline.
 Read `~/.claude/statusline-config.json` if it exists. If not, note the defaults:
 - `show_reset_at`: 0
 - `burn_threshold`: 10
+- `fable_ttl`: 300
+- `asu_cmd`: `asu`
 - `lines`: `[["ps1","git","update"],["model","ctx_bar","5h_bar","7d_bar","cost","lines"]]`
 
 ## Step 2: Show the dashboard
@@ -59,6 +61,16 @@ Meters (bar = visual bar, short = compact text):
   5h_short     5h rate limit text            [5h 27%↑] 4h
   7d_bar       7d rate limit bar             7d 12% [#|.........] 6d
   7d_short     7d rate limit text            [7d 12%] 6d
+  fable_bar    Fable weekly limit bar        fable 11% [|.........] 7d
+  fable_short  Fable weekly limit text       [fable 11%] 7d
+
+`fable_bar` and `fable_short` are off by default and stay silent unless the
+user adds them. Fable has a weekly quota of its own, and the statusline JSON
+does not carry it, so these two read it from `asu` in the background. Before
+you offer them, make sure `asu` runs: `asu claude --json`. If it does not,
+either install it (`npm install -g @allixsenos/asu`) or set `asu_cmd` to
+`npx --yes @allixsenos/asu`. The components print nothing when `asu` is
+absent, so a missing install looks the same as an empty statusline.
 
 Rate-limit bars include a `|` marker at the elapsed-time position — fill past
 the marker means usage is pulling ahead of the clock. Short variants get a
@@ -87,7 +99,7 @@ If the user already said what they want, apply it. Otherwise ask. Common operati
 - Add/remove components
 - Move components between lines
 - Add/remove lines
-- Change `show_reset_at` or `burn_threshold`
+- Change `show_reset_at`, `burn_threshold`, `fable_ttl` or `asu_cmd`
 
 ## Step 4: Write config
 
