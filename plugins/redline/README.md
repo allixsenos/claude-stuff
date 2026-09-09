@@ -66,7 +66,7 @@ Override config path with the `CLAUDE_STATUSLINE_CONFIG` env var.
 | `show_reset_at` | `0` | Show rate limit reset countdown when usage >= this %. `0` = always, `100` = never. |
 | `burn_threshold` | `10` | Percentage-point gap above elapsed time that triggers the `↑` burn icon in `5h_short`/`7d_short`. Only fires once the window is at least 20% elapsed. |
 | `fable_ttl` | `300` | Seconds between background refreshes of the Fable window. Only `fable_bar` and `fable_short` use it. |
-| `asu_cmd` | `asu` | The command that reads the Fable window. Set it to `npx --yes @allixsenos/asu` to run without a global install, or to a path for a local checkout. |
+| `asu_cmd` | auto | The command that launches asu. Leave it empty to auto-detect: `npx --yes @allixsenos/asu`, then `bunx`, then `pnpm dlx`, then a global `asu` on PATH. Set it to override, for example with a local checkout. |
 
 ### Available components
 
@@ -101,13 +101,14 @@ This is opt-in and off by default. Nothing runs until you put `fable_bar` or `fa
 
 To turn it on:
 
-1. Install asu with `npm install -g @allixsenos/asu`. Set `asu_cmd` if you prefer `npx` or a local checkout.
+1. Make sure one of `npx`, `bunx`, or `pnpm` is on your PATH. Node.js ships `npx`, so most machines pass this step already. You do not need to install asu, because the runner fetches it. A global `asu` from `npm install -g @allixsenos/asu` also works, and it is the last fallback.
 2. Add `fable_bar` or `fable_short` to a line in your config.
 
 How it behaves:
 
 - asu takes about 0.7 seconds, so the statusline never waits for it. Each render shows the cached value, and starts a background refresh when the cache is older than `fable_ttl`.
 - The first render after the cache goes cold shows nothing, and the next render shows the number.
-- The component stays silent when asu is absent, not signed in, or broken. It prints no error, because a statusline is the wrong place for one.
+- Auto-detection prefers a package runner over a global install. The runner needs no install step, and it fetches the current asu release on each cold start. A global `asu` stays at whatever version `npm install -g` last put there.
+- The component stays silent when nothing on PATH can launch asu. It also stays silent when asu is not signed in, or when asu is broken. It prints no error, because a statusline is the wrong place for one.
 - The cache is `/tmp/redline-asu-<uid>.json`. All your sessions share it, and a lock keeps only one of them refreshing.
 - The component drops a cached window whose reset time is in the past, because the percentage would describe the previous week.
