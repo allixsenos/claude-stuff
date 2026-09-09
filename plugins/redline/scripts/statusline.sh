@@ -311,6 +311,24 @@ component_7d_short() {
     "$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')"
 }
 
+# Helper: pick the command that launches asu when the config does not name one.
+# A package runner comes before a global install: it needs no install step and
+# it picks up new asu releases on its own, whereas a global asu sits at whatever
+# version `npm install -g` last put there. npx first, then the other runners in
+# order, then a bare asu on PATH. Echoes the command, or nothing when none of
+# them is installed.
+detect_asu_cmd() {
+  if command -v npx > /dev/null 2>&1; then
+    echo "npx --yes @allixsenos/asu"
+  elif command -v bunx > /dev/null 2>&1; then
+    echo "bunx @allixsenos/asu"
+  elif command -v pnpm > /dev/null 2>&1; then
+    echo "pnpm dlx @allixsenos/asu"
+  elif command -v asu > /dev/null 2>&1; then
+    echo "asu"
+  fi
+}
+
 # Helper: Fable's weekly rate limit, which the statusline JSON does not carry.
 # Claude Code parses a per-model bucket internally (rate_limits.model_scoped,
 # labelled e.g. "Fable") but only forwards five_hour, seven_day and spend_limit
@@ -323,7 +341,7 @@ asu_fable_window() {
   local cache="/tmp/redline-asu-$(id -u).json"
   local ttl asu_cmd now cached_at=0
   ttl=$(echo "$config" | jq -r '.fable_ttl // 300')
-  asu_cmd=$(echo "$config" | jq -r '.asu_cmd // "asu"')
+  asu_cmd=$(echo "$config" | jq -r '.asu_cmd // empty')
 
   now=$(date +%s)
   if [ -f "$cache" ]; then
@@ -350,14 +368,21 @@ asu_fable_window() {
       [ $((now - lock_at)) -ge "$ttl" ] && rmdir "$lock" 2>/dev/null
     fi
     if mkdir "$lock" 2>/dev/null; then
+      # Touch even when nothing can run: that bounds the PATH probing below to
+      # once per TTL as well.
       touch "$cache" 2>/dev/null
-      # Detach all three descriptors — a child holding the statusline's stdout
-      # open would block Claude Code waiting for EOF.
-      # shellcheck disable=SC2086 -- asu_cmd is split on purpose, so "npx --yes @allixsenos/asu" works
-      ( $asu_cmd claude --json > "$cache.tmp" 2>/dev/null \
-          && mv -f "$cache.tmp" "$cache" \
-          || rm -f "$cache.tmp"
-        rmdir "$lock" 2>/dev/null ) > /dev/null 2>&1 < /dev/null &
+      [ -z "$asu_cmd" ] && asu_cmd=$(detect_asu_cmd)
+      if [ -n "$asu_cmd" ]; then
+        # Detach all three descriptors — a child holding the statusline's stdout
+        # open would block Claude Code waiting for EOF.
+        # shellcheck disable=SC2086 -- asu_cmd is split on purpose, so "npx --yes @allixsenos/asu" works
+        ( $asu_cmd claude --json > "$cache.tmp" 2>/dev/null \
+            && mv -f "$cache.tmp" "$cache" \
+            || rm -f "$cache.tmp"
+          rmdir "$lock" 2>/dev/null ) > /dev/null 2>&1 < /dev/null &
+      else
+        rmdir "$lock" 2>/dev/null
+      fi
     fi
   fi
 

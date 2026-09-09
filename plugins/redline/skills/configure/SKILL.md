@@ -17,7 +17,7 @@ Read `~/.claude/statusline-config.json` if it exists. If not, note the defaults:
 - `show_reset_at`: 0
 - `burn_threshold`: 10
 - `fable_ttl`: 300
-- `asu_cmd`: `asu`
+- `asu_cmd`: auto-detect
 - `lines`: `[["ps1","git","update"],["model","ctx_bar","5h_bar","7d_bar","cost","lines"]]`
 
 ## Step 2: Show the dashboard
@@ -69,10 +69,13 @@ Meters (bar = visual bar, short = compact text):
 the user adds them. Fable has a weekly quota of its own, and the statusline
 JSON does not carry it, so these two read it from `asu` in the background.
 
-Before you offer them, make sure `asu` runs: `asu claude --json`. If it does
-not, install it (`npm install -g @allixsenos/asu`), or set `asu_cmd` to
-`npx --yes @allixsenos/asu`. The components print nothing when `asu` is
-absent, so a missing install looks the same as an empty statusline.
+The launcher is auto-detected: `npx` first, then `bunx`, then `pnpm dlx`,
+then a global `asu` on PATH.
+
+Before you offer them, make sure one of those is installed, with `command -v npx bunx pnpm asu`. If none is, `asu_cmd` can
+point at any command that accepts `claude --json`, such as a local checkout.
+The components print nothing when nothing can launch asu, so a missing
+runner looks the same as an empty statusline.
 
 Rate-limit bars carry a `|` marker at the elapsed-time position. Fill past
 the marker means usage runs ahead of the clock. Short variants get a
